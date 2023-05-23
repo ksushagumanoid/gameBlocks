@@ -1,0 +1,242 @@
+import math
+
+import pygame
+import random
+import copy
+
+
+class Button:
+    global selected_detail
+
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+        self.detail = True
+
+    def draw_without_text(self, x, y, action=None):
+        mouse = pygame.mouse.get_pos()
+        click = pygame.mouse.get_pressed()
+
+        pygame.draw.rect(sc, (23, 204, 58, 10), (x, y, self.width, self.height))
+        if x < mouse[0] < x + self.width and y < mouse[1] < y + self.height:
+            if click[0] == 1 and action is not None:
+                action()
+        else:
+            pygame.draw.rect(sc, (13, 162, 58, 100), (x, y, self.width, self.height))
+
+    def draw(self, x, y, message, action=None):
+        mouse = pygame.mouse.get_pos()
+        click = pygame.mouse.get_pressed()
+
+        pygame.draw.rect(sc, (23, 204, 58), (x, y, self.width, self.height))
+        if x < mouse[0] < x + self.width and y < mouse[1] < y + self.height:
+            if click[0] == 1 and action is not None:
+                action()
+        else:
+            pygame.draw.rect(sc, (13, 162, 58), (x, y, self.width, self.height))
+
+        font_type = pygame.font.Font('arialmt.ttf', 30)
+        text = font_type.render(message, True, (0, 0, 0))
+        sc.blit(text, (x + 10, y + 10))
+
+    def draw_circle(self, x, y, ind_fig):
+        mouse = pygame.mouse.get_pos()
+        click = pygame.mouse.get_pressed()
+        fig = det_choice
+        match ind_fig:
+            case 1:
+                fig = det_choice1
+            case 2:
+                fig = det_choice2
+            case 3:
+                fig = det_choice3
+
+        r = self.height // 5
+        if self.detail == False:
+            pygame.draw.circle(sc, (128, 128, 128, 10), (x, y), r)
+        else:
+            pygame.draw.circle(sc, (23, 204, 58, 10), (x, y), r)
+            if math.pow(x - mouse[0], 2) + math.pow(y - mouse[1], 2) < math.pow(r, 2):
+                if click[0] == 1:
+                    selecteddetail(fig, self.index)
+                    self.detail = False
+            else:
+                pygame.draw.circle(sc, (13, 162, 58, 100), (x, y), r)
+
+
+selected_detail = None
+draw_det = False
+
+
+def selecteddetail(det, index):
+    global selected_detail, draw_det
+    selected_detail = det
+    draw_det = True
+
+    for i in range(len(choice)):
+        for j in range(len(choice[i])):
+            if (i, j) == (index % I_choice, index // I_choice):
+                choice[i][j][0] = 1
+                choice[i][j][2] = pygame.Color("Gray")
+
+
+
+
+screen_x = 300
+screen_y = 900
+
+TILE = 40
+RES = 900, 950
+GAME_RES = W * TILE, H * TILE
+GAME_CHOICE = I_choice * TILE, J_choice * TILE
+
+sc = pygame.display.set_mode(RES)
+game_sc = pygame.Surface(GAME_RES)
+buffer_surface = pygame.Surface(RES)
+choice1 = pygame.Surface(GAME_CHOICE)
+choice2 = pygame.Surface(GAME_CHOICE)
+choice3 = pygame.Surface(GAME_CHOICE)
+clock = pygame.time.Clock()
+pygame.display.set_caption("game")
+
+dx = TILE
+dy = TILE
+
+dx_ch = dx * 100
+dy_ch = dy * 100
+
+fps = 60
+grid = []
+choice = []
+
+bg = pygame.image.load('out.jpg').convert()
+game_bg = pygame.image.load('in.jpg').convert()
+
+button_choice_1 = Button(I_choice * TILE + 10, J_choice * TILE + 10)
+button_choice_2 = Button(I_choice * TILE + 10, J_choice * TILE + 10)
+button_choice_3 = Button(I_choice * TILE + 10, J_choice * TILE + 10)
+
+
+details = [
+    [[-2, 0], [-1, 0], [0, 0], [1, 0]],
+    [[-1, 1], [-1, 0], [0, 0], [1, 0]],
+    [[1, 1], [-1, 0], [0, 0], [1, 0]],
+    [[-1, 1], [0, 1], [0, 0], [-1, 0]],
+    [[1, 0], [1, 1], [0, 0], [-1, 0]],
+    [[0, 1], [-1, 0], [0, 0], [1, 0]],
+    [[-1, 1], [0, 1], [0, 0], [1, 0]],
+]
+
+det = [[], [], [], [], [], [], []]
+for i in range(0, len(details)):
+    for j in range(0, len(details[i])):
+        det[i].append(
+            pygame.Rect(details[i][j][0] * dx + dx * (I_choice // 2), details[i][j][1] * dy + TILE, TILE, TILE))
+
+detail = pygame.Rect(0, 0, dx, dy)
+det_choice = copy.deepcopy(random.choice(det))
+need_choice = True
+game = True
+
+while game:
+    sc.blit(bg, (0, 0))
+    sc.blit(game_sc, (30, 30))
+    game_sc.blit(game_bg, (0, 0))
+    sc.blit(choice1, (50 + TILE * I_max + 10, 50))
+    sc.blit(choice2, (50 + TILE * I_max + 10, 50 + J_choice * TILE + 25))
+    sc.blit(choice3, (50 + TILE * I_max + 10, 50 + J_choice * TILE * 2 + 50))
+    r = button_choice_1.height // 5
+
+    delta_x = 0
+
+
+
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            exit()
+        if event.type == pygame.MOUSEMOTION and draw_det:
+            if 0 < event.pos[0] - 50 + TILE < TILE * W and 0 < event.pos[1] - 50 + TILE < TILE * H:
+                x = event.pos[0] - event.pos[0] % TILE
+                y = event.pos[1] - event.pos[1] % TILE
+
+
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and draw_det:
+            if 30 + TILE < event.pos[0] < TILE * W + 30 - TILE and 0 < event.pos[1] - 30 - TILE < TILE * H:
+
+
+    check_win()
+
+    # границы
+    for i in range(len(det_choice)):
+        if det_choice[i].x + delta_x * dx < 0 or det_choice[i].x + delta_x * dx >= screen_x:
+            delta_x = 0
+        if (det_choice[i].y + dy >= screen_y or choice[int(det_choice[i].x % dx)][int(det_choice[i].y % dy + 1)][
+            0] == 0):
+            for j in range(len(det_choice)):
+                x = int(det_choice[j].x // dx)
+                y = int(det_choice[j].y // dy)
+                choice[x][y][0] = 0  # закрашиваем квадратик
+                choice[x][y][1] = pygame.Color('Green')
+            detail.x = 0
+            detail.y = 0
+            det_choice = copy.deepcopy(random.choice(det))
+
+    for i in range(len(choice)):
+        for j in range(len(choice[i])):
+            if choice[i][j] == 1:
+                need_choice = True
+    if need_choice:
+        det_choice1 = det_choice
+        for i in range(len(det_choice)):
+            detail.x = det_choice[i].x
+            detail.y = det_choice[i].y
+            pygame.draw.rect(choice1, pygame.Color("Green"), detail)
+            button_choice_1.detail = True
+        det_choice = copy.deepcopy(random.choice(det))
+        det_choice2 = det_choice
+        for i in range(len(det_choice)):
+            detail.x = det_choice[i].x
+            detail.y = det_choice[i].y
+            pygame.draw.rect(choice2, pygame.Color("Green"), detail)
+            button_choice_2.detail = True
+        det_choice = copy.deepcopy(random.choice(det))
+        det_choice3 = det_choice
+        for i in range(len(det_choice)):
+            detail.x = det_choice[i].x
+            detail.y = det_choice[i].y
+            pygame.draw.rect(choice3, pygame.Color("Green"), detail)
+            button_choice_3.detail = True
+        det_choice = copy.deepcopy(random.choice(det))
+        need_choice = False
+
+    if not (button_choice_1.detail or button_choice_2.detail or button_choice_3.detail):
+        if not draw_det:
+            need_choice = True
+            choice1.fill(pygame.Color("Black"))
+            choice2.fill(pygame.Color("Black"))
+            choice3.fill(pygame.Color("Black"))
+            for i in range(len(choice)):
+                for j in range(len(choice[i])):
+                    choice[i][j][0] = 1
+                    choice[i][j][2] = pygame.Color("Gray")
+
+            for i in range(0, 7):
+                for j in range(0, 7):
+                    pygame.draw.rect(choice1, choice[i][j][2], choice[i][j][1], choice[i][j][0])
+                    pygame.draw.rect(choice2, choice[i][j][2], choice[i][j][1], choice[i][j][0])
+                    pygame.draw.rect(choice3, choice[i][j][2], choice[i][j][1], choice[i][j][0])
+            button_choice_1.detail = True
+            button_choice_2.detail = True
+            button_choice_3.detail = True
+            pygame.display.update()
+
+    button_choice_1.draw_circle(50 + TILE * I_max + TILE * I_choice + r + 20, 50 + 20 * 2 + r * 2,
+                                1)
+    button_choice_2.draw_circle(50 + TILE * I_max + TILE * I_choice + r + 20, 50 + TILE * I_choice + 20 * 2 + r * 2,
+                                2)
+    button_choice_3.draw_circle(50 + TILE * I_max + TILE * I_choice + r + 20, 50 + TILE * 2 * I_choice + 20 * 3 + r * 2,
+                                3)
+
+    pygame.display.update()
+    clock.tick(fps)
