@@ -19,6 +19,10 @@ class Game:
         self.detail = None
         self.detChoice = None
         self.allDetails = None
+        self.selected_detail_color = None
+        color_dict = pygame.colordict.THECOLORS
+        self.colors = list(color_dict.values())
+        self.score = 0
 
     def fillGrid(self, grid):
         for i in range(self.I_max):
@@ -37,38 +41,39 @@ class Game:
         for j in range(self.J_max):
             is_full = all(grid[i][j].haveDet == 0 for i in range(self.I_max))
             if is_full:
+                self.score += self.I_max * 100
                 for k in range(self.I_max):
-                    grid[k][j].Board.notFillCell()
+                    grid[k][j].notFillCell()
 
         # Проверка столбцов на полное заполнение
         for i in range(self.I_max):
             is_full = all(grid[i][j].haveDet == 0 for j in range(self.J_max))
             if is_full:
+                self.score += self.J_max * 100
                 for k in range(self.J_max):
                     grid[i][k].Board.notFillCell()
 
-    def selectedDetail(self, det):
+    def selectedDetail(self, det, color):
         print(det)
         self.selected_detail = det
+        self.selected_detail_color = color
         self.draw_det = True
-
-
 
     @staticmethod
     def drawField(screen, board):
         for i in range(len(board)):
             for j in range(len(board[i])):
-                pygame.draw.rect(screen, board[i][j].color, board[i][j].cell)
-
+                pygame.draw.rect(screen, board[i][j].color, board[i][j].cell, board[i][j].haveDet)
 
     def moveDet(self, screen, x, y):
+        print(self.selected_detail)
         delx = self.selected_detail[2].x - x
         dely = self.selected_detail[2].y - y
 
         for i in range(len(self.selected_detail)):
             self.selected_detail[i].x -= delx
             self.selected_detail[i].y -= dely
-            pygame.draw.rect(screen, pygame.Color("Yellow"), self.selected_detail[i])
+            pygame.draw.rect(screen, pygame.Color("Gray"), self.selected_detail[i])
             pygame.display.update()
 
     def placement(self, screen, board):
@@ -77,13 +82,13 @@ class Game:
             pos_x = self.selected_detail[i].x // self.TILE
             pos_y = self.selected_detail[i].y // self.TILE
             print(pos_x, " ", pos_y)
-            if board[pos_x][pos_y].haveDet:  # Проверяем, что квадратик уже не закрашен
+            if board[pos_x][pos_y].haveDet == 0:  # Проверяем, что квадратик уже не закрашен
                 can_place = False
                 break
         if can_place:
-            for i in range(len(selected_detail)):
-                pos_x = selected_detail[i].x // self.TILE
-                pos_y = selected_detail[i].y // self.TILE
+            for i in range(len(self.selected_detail)):
+                pos_x = self.selected_detail[i].x // self.TILE
+                pos_y = self.selected_detail[i].y // self.TILE
 
                 board[pos_x][pos_y].fillCell()
             for i in range(len(board)):
@@ -98,25 +103,25 @@ class Game:
                 for i in range(len(tmpDet)):
                     self.detail.x = self.detChoice[i].x
                     self.detail.y = self.detChoice[i].y
-                    pygame.draw.rect(screenChoice[k], pygame.Color("Green"), self.detail)
+                    pygame.draw.rect(screenChoice[k], pygame.Color("Green"), self.detail, 0)
                     buttonChoice[k].haveDetail = True
-                    buttonChoice[k].detail = tmpDet
+                    buttonChoice[k].detail = self.detChoice
                 self.detChoice = copy.deepcopy(random.choice(self.allDetails))
             self.need_choice = False
 
-    @staticmethod
-    def newChoice(screenChoice, boardChoice, buttonChoice):
+    def newChoice(self, screenChoice, boardChoice, buttonChoice):
         for i in range(len(boardChoice)):
             for j in range(len(boardChoice[i])):
-                boardChoice[i][j].Board.notFillCell()
+                boardChoice[i][j].notFillCell()
 
-        for k in range(len(boardChoice)):
+        for k in range(len(screenChoice)):
             screenChoice[k].fill(pygame.Color("Black"))
             buttonChoice[k].detail = True
             for i in range(len(boardChoice)):
                 for j in range(len(boardChoice[i])):
-                    pygame.draw.rect(screenChoice[k], boardChoice[i][j].Board.color, boardChoice[i][j].Board.cell)
-
+                    pygame.draw.rect(screenChoice[k], boardChoice[i][j].color, boardChoice[i][j].cell,
+                                     boardChoice[i][j].haveDet)
+        self.need_choice = True
 
     def details(self):
         details = [
@@ -132,7 +137,8 @@ class Game:
         for i in range(0, len(details)):
             for j in range(0, len(details[i])):
                 det[i].append(
-                    pygame.Rect(details[i][j][0] * self.TILE + self.TILE * (self.I_J_choice // 2), details[i][j][1] * self.TILE + self.TILE, self.TILE, self.TILE))
+                    pygame.Rect(details[i][j][0] * self.TILE + self.TILE * (self.I_J_choice // 2),
+                                details[i][j][1] * self.TILE + self.TILE, self.TILE, self.TILE))
         self.allDetails = det
         self.detail = pygame.Rect(0, 0, self.TILE, self.TILE)
         self.detChoice = copy.deepcopy(random.choice(det))

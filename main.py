@@ -1,6 +1,9 @@
+import random
+
 import pygame
 import Button
 import game
+import Board
 
 pygame.init()
 
@@ -41,7 +44,7 @@ gameProcess = True
 while gameProcess:
     screen.blit(bg, (0, 0))
     screen.blit(game_screen, (30, 30))
-    game_screen.blit(game_bg, (30, 30))
+    game_screen.blit(game_bg, (0, 0))
     screen.blit(choiceScreen[0], (50 + tile * I + 10, 50))
     screen.blit(choiceScreen[1], (50 + tile * I + 10, 50 + I_J_Choice * tile + 25))
     screen.blit(choiceScreen[2], (50 + tile * I + 10, 50 + I_J_Choice * tile * 2 + 50))
@@ -51,11 +54,12 @@ while gameProcess:
     for k in range(3):
         game.drawField(choiceScreen[k], choice)
 
-    buttonChoice[0].draw_circle(screen, 50 + tile * I + tile * I_J_Choice + r + 20, 50 + 20 * 2 + r * 2)
+    buttonChoice[0].draw_circle(screen, 50 + tile * I + tile * I_J_Choice + r + 20, 50 + 20 * 2 + r * 2,
+                                random.choice(game.colors), game)
     buttonChoice[1].draw_circle(screen, 50 + tile * I + tile * I_J_Choice + r + 20, 50 +
-                                tile * I_J_Choice + 20 * 2 + r * 2)
+                                tile * I_J_Choice + 20 * 2 + r * 2, random.choice(game.colors), game)
     buttonChoice[2].draw_circle(screen, 50 + tile * I + tile * I_J_Choice + r + 20,
-                                50 + tile * 2 * I_J_Choice + 20 * 3 + r * 2)
+                                50 + tile * 2 * I_J_Choice + 20 * 3 + r * 2, random.choice(game.colors), game)
 
     game.drawChoice(choiceScreen, buttonChoice)
 
@@ -73,9 +77,11 @@ while gameProcess:
 
     game.check_win(grid)
 
-    if not all(but.detail for but in buttonChoice):
+    if all(but.haveDetail == False for but in buttonChoice):
         if not game.draw_det:
             game.newChoice(choiceScreen, choice, buttonChoice)
+            game.drawChoice(choiceScreen, buttonChoice)
+    pygame.display.update()
 
     pygame.display.flip()
     clock.tick(fps)
