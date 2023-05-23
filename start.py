@@ -1,4 +1,3 @@
-import game as g
 import pygame
 import Button
 import game
@@ -9,6 +8,7 @@ res = (1100, 950)
 screen = pygame.display.set_mode(res)
 current_scene = None
 
+
 def text(message, font_sixe, x, y):
     text_color = (255, 255, 255)  # Белый цвет (RGB)
     font = pygame.font.Font(None, font_sixe)  # Шрифт None (по умолчанию), размер 36
@@ -17,6 +17,8 @@ def text(message, font_sixe, x, y):
     text_rect.x = x
     text_rect.y = y
     return str, text_rect
+
+
 def switch_scene(scene):
     global current_scene
     current_scene = scene
@@ -48,6 +50,7 @@ def startScene():
             if event.type == pygame.QUIT:
                 start = False
                 switch_scene(None)
+
 
 def difScene():
     buttonEasy = Button.Button(400, 100, 7)
@@ -96,6 +99,8 @@ def rulesScene():
             if event.type == pygame.QUIT:
                 start = False
                 switch_scene(startScene)
+
+
 def aboutScene():
     start = True
     bg = pygame.image.load('out.jpg').convert()
@@ -123,6 +128,8 @@ def aboutScene():
             if event.type == pygame.QUIT:
                 start = False
                 switch_scene(startScene)
+
+
 def gameScene(I, J):
     font = pygame.font.Font(None, 70)
 
@@ -204,8 +211,6 @@ def gameScene(I, J):
 
         pygame.display.flip()
         clock.tick(fps)
-
-
 
 
 switch_scene(startScene)
