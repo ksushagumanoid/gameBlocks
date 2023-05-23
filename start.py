@@ -194,7 +194,7 @@ def gameScene(I, J):
 
         gameBoard.check_win(grid)
         score = font.render("Total Score: {}".format(gameBoard.score), True, pygame.Color("White"))
-        screen.blit(score, (30 + 80, 30 + tile * I + 20 * 3 + 150))
+        screen.blit(score, (30 + 80, 30 + tile * J + 40))
 
         if all(but.haveDetail == False for but in buttonChoice):
             if not gameBoard.draw_det:
