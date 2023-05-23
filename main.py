@@ -51,8 +51,6 @@ while gameProcess:
     for k in range(3):
         game.drawField(choiceScreen[k], choice)
 
-
-
     buttonChoice[0].draw_circle(screen, 50 + tile * I + tile * I_J_Choice + r + 20, 50 + 20 * 2 + r * 2)
     buttonChoice[1].draw_circle(screen, 50 + tile * I + tile * I_J_Choice + r + 20, 50 +
                                 tile * I_J_Choice + 20 * 2 + r * 2)
@@ -60,8 +58,6 @@ while gameProcess:
                                 50 + tile * 2 * I_J_Choice + 20 * 3 + r * 2)
 
     game.drawChoice(choiceScreen, buttonChoice)
-
-
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -75,17 +71,11 @@ while gameProcess:
             if 30 + tile < event.pos[0] < tile * I + 30 - tile and 0 < event.pos[1] - 30 - tile < tile * J:
                 game.placement(game_screen, grid)
 
-
-
     game.check_win(grid)
-
-
 
     if not all(but.detail for but in buttonChoice):
         if not game.draw_det:
             game.newChoice(choiceScreen, choice, buttonChoice)
-
-
 
     pygame.display.flip()
     clock.tick(fps)
