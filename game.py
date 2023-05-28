@@ -45,13 +45,14 @@ class Game:
                 for k in range(self.I_max):
                     grid[k][j].notFillCell()
 
+
         # Проверка столбцов на полное заполнение
         for i in range(self.I_max):
             is_full = all(grid[i][j].haveDet == 0 for j in range(self.J_max))
             if is_full:
                 self.score += self.J_max * 100
                 for k in range(self.J_max):
-                    grid[i][k].Board.notFillCell()
+                    grid[i][k].notFillCell()
 
     def selectedDetail(self, det, color):
         print(det)
@@ -86,14 +87,15 @@ class Game:
                 can_place = False
                 break
         if can_place:
+            color = random.choice(self.colors)
             for i in range(len(self.selected_detail)):
                 pos_x = self.selected_detail[i].x // self.TILE
                 pos_y = self.selected_detail[i].y // self.TILE
 
-                board[pos_x][pos_y].fillCell()
+                board[pos_x][pos_y].fillCell(color)
             for i in range(len(board)):
                 for j in range(len(board[i])):
-                    pygame.draw.rect(screen, board[i][j].color, board[i][j].cell)
+                    pygame.draw.rect(screen, board[i][j].color, board[i][j].cell, 0)
             self.draw_det = False  # вывести на экран!!!!!!
 
     def drawChoice(self, screenChoice, buttonChoice):
@@ -101,9 +103,7 @@ class Game:
             tmpDet = self.detChoice
             for k in range(len(screenChoice)):
                 for i in range(len(tmpDet)):
-                    self.detail.x = self.detChoice[i].x
-                    self.detail.y = self.detChoice[i].y
-                    pygame.draw.rect(screenChoice[k], pygame.Color("Green"), self.detail, 0)
+                    pygame.draw.rect(screenChoice[k], pygame.Color("Green"), self.detChoice[i], 0)
                     buttonChoice[k].haveDetail = True
                     buttonChoice[k].detail = self.detChoice
                 self.detChoice = copy.deepcopy(random.choice(self.allDetails))
@@ -138,7 +138,9 @@ class Game:
             for j in range(0, len(details[i])):
                 det[i].append(
                     pygame.Rect(details[i][j][0] * self.TILE + self.TILE * (self.I_J_choice // 2),
-                                details[i][j][1] * self.TILE + self.TILE, self.TILE, self.TILE))
+                                details[i][j][1] * self.TILE + self.TILE, self.TILE, self.TILE)) #чтобы фигуры
+                # рисовались ниже от начала на одну линию,
+                # а слева на предполагаемый размер фигуры и одну линию, зависит от фигуры
         self.allDetails = det
         self.detail = pygame.Rect(0, 0, self.TILE, self.TILE)
         self.detChoice = copy.deepcopy(random.choice(det))

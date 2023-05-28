@@ -39,7 +39,7 @@ class Button:
             pygame.draw.rect(screen, (13, 162, 58), (x, y, self.width, self.height))
 
         font_type = pygame.font.Font('arialmt.ttf', 30)
-        text = font_type.render(message, True, (0, 0, 0))
+        text = font_type.render(message, True, pygame.Color("White"))
         screen.blit(text, (x + 10, y + 10))
 
     def draw_circle(self, screen, x, y, colorDet, game):

@@ -11,11 +11,9 @@ class Board:
         color_dict = pygame.colordict.THECOLORS
         self.colors = list(color_dict.values())
 
-    def fillCell(self):
+    def fillCell(self, color):
         self.haveDet = 0
-        self.color = random.choice(self.colors)
-
-
+        self.color = color
 
     def notFillCell(self):
         self.haveDet = 1
